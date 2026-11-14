@@ -47,14 +47,31 @@ public sealed class Users
         CreatedAtUtc = DateTime.UtcNow;
     }
 
-    public void UpdateDetail(string userName, string fullName, string email, string phone, DateTime? updatedAtUtc)
+    public void UpdateDetail(string userName, string fullName, string email, string phone, string? passwordHash)
     {
-        var validated = new Users(userName, fullName, email, phone, updatedAtUtc);
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            throw new ArgumentException("Username not valid", nameof(userName));
+        }
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            throw new ArgumentException("fullname not valid", nameof(fullName));
+        }
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ArgumentException("Email is required", nameof(email));
+        }
 
-        UserName = validated.UserName;
-        FullName = validated.FullName;
-        Email = validated.Email;
-        Phone = validated.Phone;
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            throw new ArgumentException("Phone is required", nameof(phone));
+        }
+
+        UserName = userName;
+        FullName = fullName;
+        Email = email;
+        Phone = phone;
+        PasswordHash = passwordHash;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

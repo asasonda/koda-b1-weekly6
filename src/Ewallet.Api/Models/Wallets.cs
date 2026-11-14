@@ -48,13 +48,13 @@ public sealed class Wallets
         UsersId = usersId;
         WalletNumber = walletNumber;
         Balance = balance;
-        Status = status;
+        Status = "status";
         CreatedAtUtc = DateTime.UtcNow;
         UpdatedAtUtc = updatedAtUtc;
     }
 
 
-    public Wallets(Users users, string walletNumber,decimal balance, string status, DateTime? updatedAtUtc)
+    public Wallets(Users users, string walletNumber,decimal balance)
     {
         if (users is null){
             throw new ArgumentNullException(nameof(users));
@@ -68,15 +68,10 @@ public sealed class Wallets
             throw new ArgumentException("Balance cannot be negative");
         }
 
-        if (string.IsNullOrWhiteSpace(status)){
-            throw new ArgumentException("Status tidak valid");
-        }
-
         Users = users;
         WalletNumber = walletNumber;
         Balance = balance;
-        Status = status;
+        Status = "ACTIVE";
         CreatedAtUtc = DateTime.UtcNow;
-        UpdatedAtUtc = updatedAtUtc;
     }
 }

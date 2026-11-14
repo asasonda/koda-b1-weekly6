@@ -36,11 +36,26 @@ public sealed class EfUserRepository : IUserRepository
 
     public async Task<Users?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, cancellationToken: cancellationToken);
     }
 
-    public Task<bool> UpdateUserAsync(Users users, CancellationToken cancellationToken)
+    public async Task<bool> UpdateUserAsync(Users users, CancellationToken cancellationToken)
     {
-        
+        var cek = await _db.Users.FirstOrDefaultAsync(u => u.Id == users.Id, cancellationToken);
+
+        if (cek is null)
+        {
+            return false;
+        }
+
+        cek.UpdateDetail(
+            users.UserName,
+            users.FullName,
+            users.Email,
+            users.Phone
+        );
+
+        await _db.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }
