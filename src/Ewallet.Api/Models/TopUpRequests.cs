@@ -51,10 +51,41 @@ public sealed class TopUpRequests
         WalletId = walletId;
         PaymentMethodId = paymentMethodId;
         Amount = amount;
-        Status = status;
+        Status = "PENDING";
         ProviderReference = providerReference;
         CreatedAtUtc = DateTime.UtcNow;
         ExpiresAtUtc =expiresAtUtc;
         PaidAtUtc = paidAtUtc;
     }
+
+    public TopUpRequests(Transactions transactions, long walletId, int paymentMethodId, decimal amount, string? providerReference)
+    {
+        if(transactions is null)
+        {
+            throw new ArgumentException("Data kosong", nameof(transactions));
+        }
+        if(walletId < 0)
+        {
+            throw new ArgumentException("Id wallet tidak boleh negative", nameof(walletId));
+        }
+        if(paymentMethodId < 0)
+        {
+            throw new ArgumentException("id PaymentMethod tidak boleh negative", nameof(paymentMethodId));
+        }
+        if(amount <= 0)
+        {
+            throw new ArgumentException("Amount tidak valid", nameof(amount));
+        }
+
+        Transactions = transactions;
+        WalletId = walletId;
+        PaymentMethodId = paymentMethodId;
+        Amount = amount;
+        Status = "PENDING";
+        ProviderReference = providerReference;
+        CreatedAtUtc = DateTime.UtcNow;
+        ExpiresAtUtc = CreatedAtUtc.AddHours(1);
+    }
+
+
 }

@@ -1,7 +1,14 @@
 using Ewallet.Api.Data;
 using Ewallet.Api.Middlewares;
+using Ewallet.Api.Repositories;
+using Ewallet.Api.Seeding;
+using Ewallet.Api.Services;
+
+
 // using Ewallet.Api.Repositories;
 // using Ewallet.Api.Services;
+
+
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -26,6 +33,15 @@ builder.Services.AddProblemDetails(
 );
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
+builder.Services.AddScoped<IUserRepository, EfUserRepository>();
+builder.Services.AddScoped<IUserServices, UserServices>();
+
+builder.Services.AddScoped<IWalletRepository, EfWalletRepository>();
+builder.Services.AddScoped<IWalletServices, WalletServices>();
+
+builder.Services.AddScoped<ITransactionRepository, EfTransactionRepository>();
+builder.Services.AddScoped<IPaymentMethod, EfPaymentMethodRepository>();
+
 // builder.Services.AddScoped<IUserRepository, SqlUserRepository>();
 // builder.Services.AddScoped<IUserServices, UserServices>();
 
@@ -39,7 +55,15 @@ var connectionString = builder.Configuration.GetConnectionString("EwalletWeekly6
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-   options.UseSqlServer(connectionString) ;
+    options.UseSqlServer(connectionString)
+        .UseSeeding((context, _) =>
+        {
+            PaymentMethodSeedData.Seed(context);
+        })
+        .UseAsyncSeeding(async (context, _, ct) =>
+        {
+                await PaymentMethodSeedData.SeedAsync(context, ct);
+        });
 });
 
 var app = builder.Build();

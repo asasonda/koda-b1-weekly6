@@ -23,10 +23,6 @@ public sealed class PaymentMethods
         {
             throw new ArgumentException("Name tidak valid", nameof(name));
         }
-        if (string.IsNullOrWhiteSpace(providerName))
-        {
-            throw new ArgumentException("Provider tidak valid", nameof(providerName));
-        }
 
         Code = code;
         Name = name;

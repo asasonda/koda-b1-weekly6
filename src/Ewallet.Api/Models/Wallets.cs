@@ -26,9 +26,9 @@ public sealed class Wallets
     public ICollection<WalletMutations> WalletMutations {get; private set;} = [];
 
 
-    public Wallets(long usersId, string walletNumber, decimal balance, string status, DateTime? updatedAtUtc )
+    public Wallets(long usersId, string walletNumber, decimal balance, string status)
     {
-        if(usersId < 0)
+        if(usersId <= 0)
         {
             throw new ArgumentException("UsersId is required", nameof(usersId));
         }
@@ -48,9 +48,8 @@ public sealed class Wallets
         UsersId = usersId;
         WalletNumber = walletNumber;
         Balance = balance;
-        Status = "status";
+        Status = "ACTIVE";
         CreatedAtUtc = DateTime.UtcNow;
-        UpdatedAtUtc = updatedAtUtc;
     }
 
 
@@ -73,5 +72,47 @@ public sealed class Wallets
         Balance = balance;
         Status = "ACTIVE";
         CreatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AddBalance(decimal amount)
+    {
+        if(amount <= 0)
+        {
+            throw new ArgumentException("Amount tidak valid", nameof(amount));
+        }
+
+        Balance += amount;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ReduceBalance(decimal amount)
+    {
+        if(amount <= 0)
+        {
+            throw new ArgumentException("Amount tidak valid", nameof(amount));
+        }
+
+        if(Balance < amount)
+        {
+            throw new ArgumentException("Saldo tidak mencukupi");
+        }
+
+        Balance -= amount;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ConfirmationSuccess()
+    {
+        if(Status != "PENDING")
+        {
+            throw new InvalidOperationException("Hanya Transaction Pending yang dapat di konfirmasi");
+        }
+
+        Status = "SUCCESS";
+    }
+
+    public void Failed()
+    {
+        Status = "FAILED";
     }
 }

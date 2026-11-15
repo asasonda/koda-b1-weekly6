@@ -24,7 +24,7 @@ public sealed class Transactions
     public TopUpRequests? TopUpRequests {get; private set;}
 
 
-    public Transactions(string referenceNo, long? senderWalletId, long receiverWalletId, string type, decimal amount, string status, string? description, DateTime? completedAtUtc)
+    public Transactions(string referenceNo, long? senderWalletId, long receiverWalletId, string type, decimal amount, string? description)
     {
         if (string.IsNullOrWhiteSpace(referenceNo))
         {
@@ -52,9 +52,8 @@ public sealed class Transactions
         ReceiverWalletId = receiverWalletId;
         Type = type;
         Amount = amount;
-        Status = status;
+        Status = "PENDING";
         Description = description;
         CreatedAtUtc = DateTime.UtcNow;
-        CompletedAtUtc = completedAtUtc;
     }
 }

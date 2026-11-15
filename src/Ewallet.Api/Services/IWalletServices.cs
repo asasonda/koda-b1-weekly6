@@ -1,11 +1,12 @@
-// using Ewallet.Api.DTOs;
+using Ewallet.Api.DTOs;
 
-// namespace Ewallet.Api.Services;
+namespace Ewallet.Api.Services;
 
-// public interface IWalletServices
-// {
-//     Task<WalletResponse?> GetByIdUsersAsync(int usersId, CancellationToken cancellationToken);
-//     Task<TransactionResponse?> TopUpAsync(int usersId, TopUpRequest request, CancellationToken cancellationToken);
+public interface IWalletServices
+{
+    Task<WalletResponse?> GetByIdWalletAsync(long id, CancellationToken cancellationToken);
+    Task<TransactionsTopUp?> TopUpAsync(long id, TopUpRequest request, CancellationToken cancellationToken);
+    Task<PaymentMethodResponse?> GetByIdTopUp(long id, CancellationToken cancellationToken);
 
-//     Task<TransactionResponse?> TransferAsync(TransferRequest request, CancellationToken cancellationToken);
-// }
+    // Task<TransactionResponse?> TransferAsync(TransferRequest request, CancellationToken cancellationToken);
+}

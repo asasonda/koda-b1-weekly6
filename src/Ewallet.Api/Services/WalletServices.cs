@@ -1,100 +1,125 @@
-// using Ewallet.Api.DTOs;
-// using Ewallet.Api.Models;
-// using Ewallet.Api.Repositories;
+using Ewallet.Api.DTOs;
+using Ewallet.Api.Models;
+using Ewallet.Api.Repositories;
 
-// namespace Ewallet.Api.Services;
+namespace Ewallet.Api.Services;
 
-// public sealed class WalletServices : IWalletServices
-// {
-//     private readonly IWalletRepository _repository;
-//     private readonly ITransactionRepository _transactionRepository;
+public sealed class WalletServices : IWalletServices
+{
+    private readonly IWalletRepository _repository;
+    private readonly IPaymentMethod _paymentMethod;
+    private readonly ITransactionRepository _transactionRepository;
 
-//     public WalletServices(IWalletRepository repository, ITransactionRepository transactionRepository)
-//     {
-//         _repository = repository;
-//         _transactionRepository = transactionRepository;
-//     }
-//     public async Task<WalletResponse?> GetByIdUsersAsync(int usersId, CancellationToken cancellationToken)
-//     {
-//         var wallets = await _repository.GetByIdUsers(usersId, cancellationToken);
-//         return wallets is null ? null : WalletResponse.FromModel(wallets);
-//     }
+    public WalletServices(IWalletRepository repository, IPaymentMethod paymentMethod, ITransactionRepository transactionRepository)
+    {
+        _repository = repository;
+        _paymentMethod = paymentMethod;
+        _transactionRepository = transactionRepository;
+    }
 
-//     public async Task<TransactionResponse?> TopUpAsync(int usersId, TopUpRequest request, CancellationToken cancellationToken)
-//     {
-//         if (request.Amount <= 0){
-//             throw new ArgumentException("Nominal top up harus lebih dari 0");
-//         }
+    public async Task<PaymentMethodResponse?> GetByIdTopUp(long id, CancellationToken cancellationToken)
+    {
+        if(id <= 0)
+        {
+            throw new ArgumentException("Id tidak valid");
+        }
+    }
 
-//         var wallet = await _repository.GetByIdUsers(usersId, cancellationToken);
 
-//         if (wallet is null){
-//             return null;
-//         }
-        
-//         var result = await _repository.TopUpAddAsync(usersId, request.Amount, cancellationToken);
+    public async Task<WalletResponse?> GetByIdWalletAsync(long usersId, CancellationToken cancellationToken)
+    {
+        var wallets = await _repository.GetByIdWallet(usersId, cancellationToken);
 
-//         if (!result){
-//             return null;
-//         }
+        if(wallets is null)
+        {
+            return null;
+        }
+        return new WalletResponse(
+            wallets.Id,
+            wallets.WalletNumber,
+            wallets.Balance,
+            wallets.Status
+        );
+    }
 
-//         var transaction = new Transactions(null, wallet.Id, "TopUp", request.Amount, "Top up saldo");
+    public async Task<TransactionsTopUp?> TopUpAsync(long id, TopUpRequest request, CancellationToken cancellationToken)
+    {
+        var wallet = await _repository.GetByIdWallet(id, cancellationToken);
 
-//         var savedTransaction = await _transactionRepository.AddAsync(transaction, cancellationToken);
+        if (wallet is null)
+        {
+            return null;
+        }
 
-//         if (savedTransaction is null){
-//             throw new InvalidOperationException("Saldo berhasil ditambahkan, tetapi riwayat transaksi gagal disimpan.");
-//         }
-//         return TransactionResponse.FromModel(savedTransaction);
-//     }
+        if(request.Amount <= 0)
+        {
+            throw new ArgumentException("Nominal harus lebih dari 0");
+        }
 
-//     public async Task<TransactionResponse?> TransferAsync(TransferRequest request, CancellationToken cancellationToken)
-//     {
-//         if (request.Amount <= 0)
-//             throw new ArgumentException("Nominal transfer harus lebih dari 0.");
+        var cekReference = await _transactionRepository.GetReferenceNo(cancellationToken);
 
-//         var sender = await _repository.GetByIdUsers(request.SenderWalletId, cancellationToken);
+        int number = 1;
 
-//         if (sender is null){
-//             throw new KeyNotFoundException("Wallet pengirim tidak ditemukan.");
-//         }
+        if(cekReference is not null)
+        {
+            number = int.Parse(cekReference[3..]) + 1;
+        }
 
-//         var receiver = await _repository.GetByIdUsers(request.ReceiverWalletId, cancellationToken);
+        var referenceNo = $"RF{number:D3}";
 
-//         if (receiver is null){
-//             throw new KeyNotFoundException("Wallet penerima tidak ditemukan.");
-//         }
-        
-//         if (sender.Id == receiver.Id){
-//             throw new ArgumentException("Tidak bisa transfer ke wallet sendiri.");
-//         }
-        
-//         var debit = await _repository.ReduceBalanceAsync(sender.Id, request.Amount, cancellationToken);
+        var transaction = new Transactions(
+            referenceNo,
+            null,
+            id,
+            "TOPUP",
+            request.Amount,
+            "TopUp Saldo"
+        );
 
-//         if (!debit){
-//             throw new InvalidOperationException("Saldo pengirim tidak mencukupi.");
-//         }
-        
-//         var credit = await _repository.AddBalanceAsync(receiver.Id,request.Amount, cancellationToken);
+        var paymentMethod = await _paymentMethod.GetByIdAsync(request.PaymentMethodId, cancellationToken);
+        if(paymentMethod is null)
+        {
+            return null;
+        }
 
-//         if (!credit){
-//             throw new InvalidOperationException("Gagal menambahkan saldo penerima.");
-//         }
+        if (!paymentMethod.IsActive)
+        {
+            return null;
+        }
 
-//         var transaction = new Transactions(
-//             sender.Id,
-//             receiver.Id,
-//             "Transfer",
-//             request.Amount,
-//             request.Description
-//         );
+        var topUp = new TopUpRequests(
+            transaction,
+            id,
+            request.PaymentMethodId,
+            request.Amount,
+            null
+        );
 
-//         var savedTransaction = await _transactionRepository.AddAsync(transaction, cancellationToken);
+        var created = await _repository.CreateTopUp(transaction, topUp, cancellationToken);
 
-//         if (savedTransaction is null){
-//             throw new InvalidOperationException("Gagal menyimpan riwayat transaksi.");
-//         }
-        
-//         return TransactionResponse.FromModel(savedTransaction);
-//     }
-// }
+        if (!created)
+        {
+            return null;
+        }
+
+        return new TransactionsTopUp(
+            transaction.Id,
+            transaction.ReferenceNo,
+            transaction.SenderWalletId,
+            transaction.ReceiverWalletId,
+            transaction.Type,
+            transaction.Amount,
+            transaction.Status,
+            new TopUpResponse(
+                topUp.Id,
+                topUp.TransactionId,
+                topUp.WalletId,
+                topUp.PaymentMethodId,
+                topUp.Amount,
+                topUp.Status,
+                topUp.CreatedAtUtc
+            )
+        );
+
+    }
+}

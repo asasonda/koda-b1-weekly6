@@ -1,3 +1,4 @@
+using Ewallet.Api.DTOs;
 using Ewallet.Api.Models;
 
 namespace Ewallet.Api.Repositories;
@@ -5,9 +6,8 @@ namespace Ewallet.Api.Repositories;
 public interface IUserRepository
 {
     Task<IReadOnlyList<Users>> GetAllAsync(CancellationToken cancellationToken);
-    Task<Users?> GetByIdAsync(int id, CancellationToken cancellationToken);
+    Task<Users?> GetByIdAsync(long id, CancellationToken cancellationToken);
     Task<bool> AddUserWithWalletAsync(Users users, Wallets wallets, CancellationToken cancellationToken);
+    Task<string?> GetWalletNumberAsync(CancellationToken cancellationToken);
     Task<bool> UpdateUserAsync(Users users, CancellationToken cancellationToken);
-
-    Task<b
 }

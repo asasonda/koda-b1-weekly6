@@ -29,31 +29,24 @@ public sealed class EfUserRepository : IUserRepository
         }
     }
 
-    public async Task<IReadOnlyList<Users>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<string?> GetWalletNumberAsync(CancellationToken cancellationToken)
     {
-        return await _db.Users.AsNoTracking().OrderBy(u => u.FullName).ToArrayAsync(cancellationToken);
+        return await _db.Wallets.AsNoTracking().OrderByDescending(w => w.WalletNumber).Select(w => w.WalletNumber).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Users?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<Users>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, cancellationToken: cancellationToken);
+        return await _db.Users.AsNoTracking().Include(u => u.Wallets).OrderBy(u => u.FullName).ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<Users?> GetByIdAsync(long id, CancellationToken cancellationToken)
+    {
+        return await _db.Users.AsNoTracking().Include(u => u.Wallets).FirstOrDefaultAsync(u => u.Id == id, cancellationToken: cancellationToken);
     }
 
     public async Task<bool> UpdateUserAsync(Users users, CancellationToken cancellationToken)
     {
-        var cek = await _db.Users.FirstOrDefaultAsync(u => u.Id == users.Id, cancellationToken);
-
-        if (cek is null)
-        {
-            return false;
-        }
-
-        cek.UpdateDetail(
-            users.UserName,
-            users.FullName,
-            users.Email,
-            users.Phone
-        );
+        _db.Users.Update(users);
 
         await _db.SaveChangesAsync(cancellationToken);
         return true;

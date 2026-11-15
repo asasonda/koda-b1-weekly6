@@ -1,44 +1,17 @@
 @base = http://localhost:5256
 
-### get
-GET {{base}}/api/users
+### Get Wallet
+GET {{base}}/api/wallets/2
 Accept: application/json
-
-### post
-POST {{base}}/api/users
-Accept: application/json
-Content-Type: application/json
-
-{
-    "name" : "Citra",
-    "email" : "citra@gmail.com",
-    "phone" : "081300991023",
-    "walletNumber": "WAL003"
-}
-
-### update
-PUT {{base}}/api/users/1
-Accept: application/json
-Content-Type: application/json
-
-{
-    "name" : "Budiman",
-    "email" : "budiman@gmail.com",
-    "phone" : "081200040988"
-}
-
-### Get Wallet by userId
-GET {{base}}/api/wallets/1
-Accept: application/json
-
 
 
 ### topup
-POST {{base}}/api/wallets/6/topups
+POST {{base}}/api/wallets/2/topups
 Accept: application/json
 Content-Type: application/json
 
 {
+    "paymentMethodId" : 1,
     "amount" : 45000
 }
 

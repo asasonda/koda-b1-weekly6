@@ -1,0 +1,35 @@
+@base = http://localhost:5256
+
+### get
+GET {{base}}/api/users
+Accept: application/json
+
+### get
+GET {{base}}/api/users/1
+Accept: application/json
+
+### post
+POST {{base}}/api/users
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username" : "Citra",
+    "fullname": "Citra Kumala",
+    "email" : "citra@gmail.com",
+    "phone" : "081300991023",
+    "passwordHash" : null
+}
+
+### update
+PUT {{base}}/api/users/3
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username" : "Citra",
+    "fullname": "Citra Tess",
+    "email" : "citra@gmail.com",
+    "phone" : "081300991023",
+    "passwordHash" : null
+}

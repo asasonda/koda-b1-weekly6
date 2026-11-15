@@ -42,3 +42,21 @@
 
 create DATABASE EwalletWeekly6
 
+select * from Users
+EXEC sp_help 'Users';
+
+
+select * from Wallets
+select * from PaymentMethods
+
+select * from Transactions
+
+select
+    t.ReferenceNo,
+    t.Type,
+    t.Amount,
+    t.Status,
+    pm.Code
+from Transactions t
+join TopUpRequests tp on tp.TransactionId = t.Id
+join PaymentMethods pm on pm.Id = tp.PaymentMethodId

@@ -1,56 +1,153 @@
-// using Ewallet.Api.DTOs;
-// using Ewallet.Api.Models;
-// using Ewallet.Api.Repositories;
+using Ewallet.Api.DTOs;
+using Ewallet.Api.Models;
+using Ewallet.Api.Repositories;
 
-// namespace Ewallet.Api.Services;
+namespace Ewallet.Api.Services;
 
-// public sealed class UserServices : IUserServices
-// {
-//     private readonly IUserRepository _repository;
-//     private readonly ITransactionRepository _transactionRepository;
+public sealed class UserServices : IUserServices
+{
+    private readonly IUserRepository _repository;
 
-//     public UserServices(IUserRepository repository, ITransactionRepository transactionRepository)
-//     {
-//         _repository = repository;
-//         _transactionRepository = transactionRepository;
-//     }
+    public UserServices(IUserRepository repository)
+    {
+        _repository = repository;
+    }
 
-//     public async Task<UserResponse?> CreateAsync(UserRequest request, CancellationToken cancellationToken)
-//     {
-//         var users = new Users(request.Name, request.Email, request.Phone);
-//         var wallets = new Wallets(request.WalletNumber);
-//         var created = await _repository.AddUserWithWalletAsync(users, wallets, cancellationToken);
+    public async Task<UserResponse?> CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken)
+    {
+        var users = new Users(
+            request.UserName,
+            request.FullName,
+            request.Email,
+            request.Phone,
+            null
+        );
 
-//         return created ? UserResponse.FromModel(users) : null;
-//     }
+        var cekWalletNumber = await _repository.GetWalletNumberAsync(cancellationToken);
 
-//     public async Task<IReadOnlyList<UserResponse>> GetAllAsync(CancellationToken cancellationToken)
-//     {
-//         var users = await _repository.GetAllAsync(cancellationToken);
-//         return users.Select(UserResponse.FromModel).ToArray();
-//     }
+        int number = 1;
 
-//     public async Task<UserResponse?> GetByIdAsync(int id, CancellationToken cancellationToken)
-//     {
-//         if (id < 0)
-//         {
-//             return null;
-//         }
-//         var users = await _repository.GetByIdAsync(id, cancellationToken);
-//         return users is null ? null : UserResponse.FromModel(users);
-//     }
+        if(cekWalletNumber is not null)
+        {
+            number = int.Parse(cekWalletNumber[3..]) + 1;
+        }
 
-//     public async Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request, CancellationToken cancellationToken)
-//     {
-//         var users = new Users(id, request.Name, request.Email, request.Phone);
-//         var updated = await _repository.UpdateUserAsync(users, cancellationToken);
-//         return updated ? UserResponse.FromModel(users) : null;
-//     }
+        var walletNumber = $"WAL{number:D3}";
 
-//     public async Task<IReadOnlyList<TransactionResponse>> GetTransactionsByUsersIdAsync(int usersId, CancellationToken cancellationToken)
-//     {
-//         var transactions = await _transactionRepository.GetByUsersIdAsync(usersId, cancellationToken);
+        var wallet = new Wallets(
+            users,
+            walletNumber,
+            0
+        );
 
-//         return transactions.Select(TransactionResponse.FromModel).ToList();
-//     }
-// }
+        var created = await _repository.AddUserWithWalletAsync(users, wallet, cancellationToken);
+
+        if (!created)
+        {
+            return null;
+        }
+
+        return new UserResponse(
+            users.Id,
+            users.UserName,
+            users.FullName,
+            users.Email,
+            users.Phone,
+            users.Status,
+            users.CreatedAtUtc,
+            users.UpdatedAtUtc,
+            new WalletResponse(
+                users.Wallets.Id,
+                users.Wallets.WalletNumber,
+                users.Wallets.Balance,
+                users.Wallets.Status
+            )
+        );
+    }
+
+    public async Task<IReadOnlyList<UserResponse>> GetAllUserAsync(CancellationToken cancellationToken)
+    {
+        var users = await _repository.GetAllAsync(cancellationToken);
+
+        return users.Select(u => new UserResponse
+        (
+            u.Id,
+            u.UserName,
+            u.FullName,
+            u.Email,
+            u.Phone,
+            u.Status,
+            u.CreatedAtUtc,
+            u.UpdatedAtUtc,
+            new WalletResponse(u.Wallets.Id, u.Wallets.WalletNumber, u.Wallets.Balance, u.Wallets.Status)
+        )).ToArray();
+    }
+
+    public async Task<UserResponse?> GetByUserIdAsync(long id, CancellationToken cancellationToken)
+    {
+        var users = await _repository.GetByIdAsync(id, cancellationToken);
+        if(users is null)
+        {
+            return null;
+        }
+
+        return new UserResponse(
+            users.Id,
+            users.UserName,
+            users.FullName,
+            users.Email,
+            users.Phone,
+            users.Status,
+            users.CreatedAtUtc,
+            users.UpdatedAtUtc,
+            new WalletResponse(
+                users.Wallets.Id,
+                users.Wallets.WalletNumber,
+                users.Wallets.Balance,
+                users.Wallets.Status
+            )
+        );
+    }
+
+    public async Task<UserResponse?> UpdateUserAsync(long id, UpdatedUserRequest request, CancellationToken cancellationToken)
+    {
+        var users = await _repository.GetByIdAsync(id, cancellationToken);
+
+        if(users is null)
+        {
+            return null;
+        }
+
+        users.UpdateDetail(
+            request.UserName,
+            request.FullName,
+            request.Email,
+            request.Phone,
+            request.PasswordHash
+        );
+
+        var update = await _repository.UpdateUserAsync(users, cancellationToken);
+        if (!update)
+        {
+            return null;
+        }
+
+        return new UserResponse(
+            users.Id,
+            users.UserName,
+            users.FullName,
+            users.Email,
+            users.Phone,
+            users.Status,
+            users.CreatedAtUtc,
+            users.UpdatedAtUtc,
+            new WalletResponse(
+                users.Wallets.Id,
+                users.Wallets.WalletNumber,
+                users.Wallets.Balance,
+                users.Wallets.Status
+            )
+        );
+    }
+
+}
