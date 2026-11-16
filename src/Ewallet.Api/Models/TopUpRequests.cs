@@ -88,4 +88,25 @@ public sealed class TopUpRequests
     }
 
 
+    public void ConfirmationSuccess()
+    {
+        if(Status != "PENDING")
+        {
+            throw new InvalidOperationException("Hanya Transaction Pending yang dapat di konfirmasi");
+        }
+
+        Status = "PAID";
+    }
+
+    public void Failed()
+    {
+        Status = "FAILED";
+    }
+    
+    public void Expired()
+    {
+        Status = "EXPIRED";
+    }
+
+
 }

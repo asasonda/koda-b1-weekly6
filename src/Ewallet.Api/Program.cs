@@ -42,6 +42,12 @@ builder.Services.AddScoped<IWalletServices, WalletServices>();
 builder.Services.AddScoped<ITransactionRepository, EfTransactionRepository>();
 builder.Services.AddScoped<IPaymentMethod, EfPaymentMethodRepository>();
 
+builder.Services.AddScoped<ITopUpRequest, EfTopUpRequestRespository>();
+builder.Services.AddScoped<ITopUpRequestServices, TopUpRequestService>();
+
+builder.Services.AddScoped<IPaymentMethod, EfPaymentMethodRepository>();
+builder.Services.AddScoped<IPaymentMethodServices, PaymentMethodServices>();
+
 // builder.Services.AddScoped<IUserRepository, SqlUserRepository>();
 // builder.Services.AddScoped<IUserServices, UserServices>();
 

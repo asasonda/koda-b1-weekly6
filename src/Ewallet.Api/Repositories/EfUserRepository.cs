@@ -14,18 +14,27 @@ public sealed class EfUserRepository : IUserRepository
     }
     public async Task<bool> AddUserWithWalletAsync(Users users, Wallets wallets, CancellationToken cancellationToken)
     {
-        _db.Users.Add(users);
-        _db.Wallets.Add(wallets);
+        await using var transaction = await _db.Database.BeginTransactionAsync(cancellationToken);
         try
         {
+            _db.Users.Add(users);
+            _db.Wallets.Add(wallets);
             await _db.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
             return true;
         }
         catch (DbUpdateException e) when (e.InnerException is SqlException { Number: 2601 or 2627 })
         {
+            await transaction.RollbackAsync(cancellationToken);
+
             _db.Entry(users).State = EntityState.Detached;
             _db.Entry(wallets).State = EntityState.Detached;
             return false;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
         }
     }
 

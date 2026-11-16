@@ -100,19 +100,4 @@ public sealed class Wallets
         Balance -= amount;
         UpdatedAtUtc = DateTime.UtcNow;
     }
-
-    public void ConfirmationSuccess()
-    {
-        if(Status != "PENDING")
-        {
-            throw new InvalidOperationException("Hanya Transaction Pending yang dapat di konfirmasi");
-        }
-
-        Status = "SUCCESS";
-    }
-
-    public void Failed()
-    {
-        Status = "FAILED";
-    }
 }

@@ -30,4 +30,21 @@ public sealed class PaymentMethods
         IsActive = isActive;
         CreatedAtUtc = DateTime.UtcNow;
     }
+
+    public PaymentMethods(string code, string name, bool isActive)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new ArgumentException("Code tidak valid", nameof(code));
+        }
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Name tidak valid", nameof(name));
+        }
+
+        Code = code;
+        Name = name;
+        IsActive = isActive;
+        CreatedAtUtc = DateTime.Now;
+    }
 }

@@ -26,36 +26,21 @@ public sealed class EfWalletRepository : IWalletRepository
         return true;
     }
 
-    public async Task<bool> ConfirmAsync(long id, CancellationToken cancellationToken)
-    {
-        var wallet = await _db.Wallets.AsNoTracking().FirstOrDefaultAsync(w => w.Id == id ,cancellationToken);
-        if(wallet is null)
-        {
-            return false;
-        }
-
-        var topUp = await _db.TopUpRequests.AsNoTracking().FirstOrDefaultAsync(tp => tp.Id == id,cancellationToken);
-        if (topUp is null)
-        {
-            return false;
-        }
-
-        wallet.ConfirmationSuccess();
-        wallet.AddBalance(topUp.Amount);
-        return true;
-    }
-
     public async Task<bool> CreateTopUp(Transactions transactions, TopUpRequests topUpRequests, CancellationToken cancellationToken)
     {
-        _db.Transactions.Add(transactions);
-        _db.TopUpRequests.Add(topUpRequests);
+        await using var transaction = await _db.Database.BeginTransactionAsync(cancellationToken);
+
         try
         {
+            _db.Transactions.Add(transactions);
+            _db.TopUpRequests.Add(topUpRequests);
             await _db.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
             return true;
         }
         catch (System.Exception)
         {
+            await transaction.RollbackAsync(cancellationToken);
             _db.Entry(transactions).State = EntityState.Detached;
             _db.Entry(topUpRequests).State = EntityState.Detached;
             return false;
@@ -84,5 +69,4 @@ public sealed class EfWalletRepository : IWalletRepository
         wallet.ReduceBalance(amount);
         return true;
     }
-
 }

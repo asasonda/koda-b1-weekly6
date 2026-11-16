@@ -56,4 +56,42 @@ public sealed class Transactions
         Description = description;
         CreatedAtUtc = DateTime.UtcNow;
     }
+
+    public Transactions(string referenceNo, long receiverWalletId, string type, decimal amount, string? description)
+    {
+        if (string.IsNullOrWhiteSpace(referenceNo))
+        {
+            throw new ArgumentException("Referensi tidak valid", nameof(referenceNo));
+        }
+        if(receiverWalletId < 0)
+        {
+            throw new ArgumentException("ReceiverId tidak valid, must be positive id", nameof(receiverWalletId));
+        }
+        if (string.IsNullOrWhiteSpace(type))
+        {
+            throw new ArgumentException("type is required", nameof(type));
+        }
+        if(amount <= 0)
+        {
+            throw new ArgumentException("Amount tidak valid, must be positive value", nameof(amount));
+        }
+
+        ReferenceNo = referenceNo;
+        ReceiverWalletId = receiverWalletId;
+        Type = type;
+        Amount = amount;
+        Status = "PENDING";
+        Description = description;
+        CreatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ConfirmationSuccess()
+    {
+        if(Status != "PENDING")
+        {
+            throw new InvalidOperationException("Hanya Transaction Pending yang dapat di konfirmasi");
+        }
+
+        Status = "SUCCESS";
+    }
 }

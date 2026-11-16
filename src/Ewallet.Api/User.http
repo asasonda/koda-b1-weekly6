@@ -14,22 +14,22 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "username" : "Citra",
-    "fullname": "Citra Kumala",
-    "email" : "citra@gmail.com",
-    "phone" : "081300991023",
+    "username" : "Rizal",
+    "fullname": "Rizal",
+    "email" : "rizal@gmail.com",
+    "phone" : "080012340000",
     "passwordHash" : null
 }
 
 ### update
-PUT {{base}}/api/users/3
+PUT {{base}}/api/users/10
 Accept: application/json
 Content-Type: application/json
 
 {
-    "username" : "Citra",
-    "fullname": "Citra Tess",
-    "email" : "citra@gmail.com",
-    "phone" : "081300991023",
+    "username" : "Rizal K. Tanjiro",
+    "fullname": "Tanjiro",
+    "email" : "tanjiro@gmail.com",
+    "phone" : "081300990000",
     "passwordHash" : null
 }

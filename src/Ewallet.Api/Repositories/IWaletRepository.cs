@@ -9,5 +9,4 @@ public interface IWalletRepository
     Task<TopUpRequests?> GetByWalletIdTopUp(long id, CancellationToken cancellationToken);
     Task<bool> ReduceBalanceAsync(long id, decimal amount, CancellationToken cancellationToken);
     Task<bool> AddBalanceAsync(long id, decimal amount, CancellationToken cancellationToken);
-    Task<bool> ConfirmAsync(long id, CancellationToken cancellationToken);
 }

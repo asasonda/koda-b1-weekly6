@@ -9,18 +9,20 @@ namespace Ewallet.Api.Controllers;
 public sealed class WalletController : ControllerBase
 {
     private readonly IWalletServices _service;
+    private readonly ITopUpRequestServices _topUpService;
 
-    public WalletController(IWalletServices services)
+    public WalletController(IWalletServices services, ITopUpRequestServices topUpService)
     {
         _service = services;
+        _topUpService = topUpService;
     }
 
-    [HttpGet("{walletId}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(typeof(WalletResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<WalletResponse>>> GetByWalletId([FromRoute] long walletId, CancellationToken cancellationToken)
+    public async Task<ActionResult<WalletResponse>> GetByWalletId([FromRoute] long id, CancellationToken cancellationToken)
     {
-        var wallets = await _service.GetByIdWalletAsync(walletId, cancellationToken);
+        var wallets = await _service.GetByIdWalletAsync(id, cancellationToken);
         return wallets is null ? Problem(statusCode: StatusCodes.Status404NotFound, title:"Data tidak ditemukan") : Ok(wallets);
     }
 
@@ -47,7 +49,7 @@ public sealed class WalletController : ControllerBase
 
             return Ok(new
             {
-                message = "Top up berhasil",
+                message = "Top up Created",
                 data = result
             });
         }
@@ -69,4 +71,55 @@ public sealed class WalletController : ControllerBase
         }
     }
 
+    [HttpGet("{walletId}/topups/detail")]
+    [ProducesResponseType(typeof(PaymentMethodResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PaymentMethodResponse>> GetByITopUp([FromRoute] long walletId, CancellationToken cancellationToken)
+    {
+        var topUps = await _topUpService.GetByWalletIdTopUpAsync(walletId, cancellationToken);
+        return topUps is null ? Problem(statusCode: StatusCodes.Status404NotFound, title: "data tidak ditemukan") : Ok(topUps);
+    }
+
+    [HttpPatch("{id}/topups/confirm")]
+    [ProducesResponseType(typeof(TopUpResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<TopUpResponse>> Confirm([FromRoute] long id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var confirm = await _topUpService.ConfirmTopUpAsync(id, cancellationToken);
+            if(confirm is null)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Data topup tidak ditemukan",
+                    detail: $"Wallet dengan topUp id {id} tidak ditemukan"
+                );
+            }
+
+            return Ok(new
+            {
+                message = "Top Up Success",
+                data = confirm
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Top up belum di confirm",
+                detail: ex.Message
+            );
+        }
+        catch (Exception)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status500InternalServerError,
+                title: "Internal Server Error",
+                detail: "Terjadi kesalahan saat memproses top up."
+            );
+        }
+    }
 }

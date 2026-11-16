@@ -17,18 +17,9 @@ public sealed class WalletServices : IWalletServices
         _transactionRepository = transactionRepository;
     }
 
-    public async Task<PaymentMethodResponse?> GetByIdTopUp(long id, CancellationToken cancellationToken)
+    public async Task<WalletResponse?> GetByIdWalletAsync(long id, CancellationToken cancellationToken)
     {
-        if(id <= 0)
-        {
-            throw new ArgumentException("Id tidak valid");
-        }
-    }
-
-
-    public async Task<WalletResponse?> GetByIdWalletAsync(long usersId, CancellationToken cancellationToken)
-    {
-        var wallets = await _repository.GetByIdWallet(usersId, cancellationToken);
+        var wallets = await _repository.GetByIdWallet(id, cancellationToken);
 
         if(wallets is null)
         {
@@ -59,17 +50,14 @@ public sealed class WalletServices : IWalletServices
         var cekReference = await _transactionRepository.GetReferenceNo(cancellationToken);
 
         int number = 1;
-
         if(cekReference is not null)
         {
             number = int.Parse(cekReference[3..]) + 1;
         }
-
         var referenceNo = $"RF{number:D3}";
 
         var transaction = new Transactions(
             referenceNo,
-            null,
             id,
             "TOPUP",
             request.Amount,
@@ -77,6 +65,7 @@ public sealed class WalletServices : IWalletServices
         );
 
         var paymentMethod = await _paymentMethod.GetByIdAsync(request.PaymentMethodId, cancellationToken);
+
         if(paymentMethod is null)
         {
             return null;
@@ -105,21 +94,20 @@ public sealed class WalletServices : IWalletServices
         return new TransactionsTopUp(
             transaction.Id,
             transaction.ReferenceNo,
-            transaction.SenderWalletId,
             transaction.ReceiverWalletId,
             transaction.Type,
             transaction.Amount,
             transaction.Status,
-            new TopUpResponse(
+            new TopUpSummaryResponse(
                 topUp.Id,
-                topUp.TransactionId,
-                topUp.WalletId,
-                topUp.PaymentMethodId,
-                topUp.Amount,
-                topUp.Status,
-                topUp.CreatedAtUtc
+                new PaymentMethodResponse(
+                    paymentMethod.Id,
+                    paymentMethod.Code,
+                    paymentMethod.Name
+                ),
+                topUp.ExpiresAtUtc
             )
-        );
 
+        );
     }
 }

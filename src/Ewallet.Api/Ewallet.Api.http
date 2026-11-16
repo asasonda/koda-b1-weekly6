@@ -1,22 +1,5 @@
 @base = http://localhost:5256
 
-### Get Wallet
-GET {{base}}/api/wallets/2
-Accept: application/json
-
-
-### topup
-POST {{base}}/api/wallets/2/topups
-Accept: application/json
-Content-Type: application/json
-
-{
-    "paymentMethodId" : 1,
-    "amount" : 45000
-}
-
-
-
 ### Transfer
 POST {{base}}/api/transfers
 Content-Type: application/json

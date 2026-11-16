@@ -53,4 +53,38 @@ public sealed class WalletMutations
         BalanceAfter = balanceAfter;
         CreatedAtUtc = DateTime.UtcNow;
     }
+
+    public WalletMutations(Transactions transactions, long walletId, string direction, decimal amount, decimal balanceBefore, decimal balanceAfter)
+    {
+        if(walletId < 0)
+        {
+            throw new ArgumentException("Wallet id harus positive", nameof(walletId));
+        }
+        if(direction.ToUpper() != "IN" && direction.ToUpper() != "OUT")
+        {
+            throw new ArgumentException("Tidak sesuai format", nameof(direction));
+        }
+        if(amount <= 0)
+        {
+            throw new ArgumentException("Amount harus positiv", nameof(amount));
+        }
+        if(balanceBefore < 0)
+        {
+            throw new ArgumentException("Balance harus angka positiv", nameof(balanceBefore));
+        }
+        if(balanceAfter < 0)
+        {
+            throw new ArgumentException("Balance harus angka positif", nameof(balanceAfter));
+        }
+        
+        Transactions = transactions;
+        WalletId = walletId;
+        Direction = direction;
+        Amount = amount;
+        BalanceBefore = balanceBefore;
+        BalanceAfter = balanceAfter;
+        CreatedAtUtc = DateTime.UtcNow;
+    }
+
+
 }
