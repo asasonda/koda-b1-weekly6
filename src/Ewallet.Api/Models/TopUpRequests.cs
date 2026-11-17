@@ -26,15 +26,15 @@ public sealed class TopUpRequests
 
     public TopUpRequests(long transactionId, long walletId, int paymentMethodId, decimal amount, string status, string? providerReference, DateTime? expiresAtUtc, DateTime? paidAtUtc)
     {
-        if(transactionId < 0)
+        if(transactionId <= 0)
         {
             throw new ArgumentException("id transaction tidak boleh negative", nameof(transactionId));
         }
-        if(walletId < 0)
+        if(walletId <= 0)
         {
             throw new ArgumentException("Id wallet tidak boleh negative", nameof(walletId));
         }
-        if(paymentMethodId < 0)
+        if(paymentMethodId <= 0)
         {
             throw new ArgumentException("id PaymentMethod tidak boleh negative", nameof(paymentMethodId));
         }
@@ -64,11 +64,11 @@ public sealed class TopUpRequests
         {
             throw new ArgumentException("Data kosong", nameof(transactions));
         }
-        if(walletId < 0)
+        if(walletId <= 0)
         {
             throw new ArgumentException("Id wallet tidak boleh negative", nameof(walletId));
         }
-        if(paymentMethodId < 0)
+        if(paymentMethodId <= 0)
         {
             throw new ArgumentException("id PaymentMethod tidak boleh negative", nameof(paymentMethodId));
         }

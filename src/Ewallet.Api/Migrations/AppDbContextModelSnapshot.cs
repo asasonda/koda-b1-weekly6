@@ -116,7 +116,7 @@ namespace Ewallet.Api.Migrations
 
                     b.ToTable("PaymentMethods", "dbo", t =>
                         {
-                            t.HasCheckConstraint("CK_PaymentMethod_Code", "[Code] in ('BANK_TRANSFER', 'QRIS')");
+                            t.HasCheckConstraint("CK_PaymentMethod_Code", "[Code] in ('BANK_TRANSFER', 'QRIS', 'GoPay')");
                         });
                 });
 

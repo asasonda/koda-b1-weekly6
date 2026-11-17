@@ -47,10 +47,9 @@ public sealed class EfWalletRepository : IWalletRepository
         }
     }
     
-
-    public async Task<Wallets?> GetByIdWallet(long id, CancellationToken cancellationToken)
+    public async Task<Wallets?> GetByIdWallet(long walletId, CancellationToken cancellationToken)
     {
-        return await _db.Wallets.AsNoTracking().FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+        return await _db.Wallets.FirstOrDefaultAsync(w => w.Id == walletId, cancellationToken);
     }
 
     public async Task<TopUpRequests?> GetByWalletIdTopUp(long id, CancellationToken cancellationToken)

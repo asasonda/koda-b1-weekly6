@@ -9,6 +9,7 @@ public sealed class PaymentMethodSeedData
     {
         yield return new PaymentMethods("BANK_TRANSFER", "Bank BCA", null, true);
         yield return new PaymentMethods("QRIS", "Qris", null, true);
+        yield return new PaymentMethods("GoPay", "Gopay", null, false);
     }
 
     public static void Seed(DbContext context)

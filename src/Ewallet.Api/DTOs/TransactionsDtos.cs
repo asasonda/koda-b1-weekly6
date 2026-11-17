@@ -50,3 +50,16 @@ public sealed record PaymentMethodDetailsResponse(
     bool IsActive
 );
 
+
+
+public sealed record TransactionsTransferResponse(
+    long Id, 
+    string ReferenceNo, 
+    long? SenderWalletId, 
+    long ReceiverWalletId, 
+    string Type, 
+    decimal Amount, 
+    string Status, 
+    DateTime CreatedAtUtc,
+    DateTime? CompletedAtUtc
+);

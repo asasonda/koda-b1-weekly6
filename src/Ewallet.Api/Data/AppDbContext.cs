@@ -239,7 +239,7 @@ public sealed class AppDbContext : DbContext
         {
             entity.ToTable("PaymentMethods" , "dbo", table =>
             {
-               table.HasCheckConstraint("CK_PaymentMethod_Code", "[Code] in ('BANK_TRANSFER', 'QRIS')"); 
+               table.HasCheckConstraint("CK_PaymentMethod_Code", "[Code] in ('BANK_TRANSFER', 'QRIS', 'GoPay')"); 
             });
 
             entity.HasKey(pm => pm.Id);

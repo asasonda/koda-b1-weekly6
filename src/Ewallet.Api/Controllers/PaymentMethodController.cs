@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ewallet.Api.Controllers;
 
 [ApiController]
-[Route("/api/payment-method")]
+[Route("api/payment-method")]
 
 public sealed class PaymentMethodController : ControllerBase
 {
@@ -47,7 +47,5 @@ public sealed class PaymentMethodController : ControllerBase
                 detail: "Terjadi kesalahan saat memproses top up."
             );
         }
-
-        
     }
 }

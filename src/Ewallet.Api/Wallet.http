@@ -1,24 +1,24 @@
 @base = http://localhost:5256
 
 ### Get Wallet
-GET {{base}}/api/wallets/6
+GET {{base}}/api/wallets/1
 Accept: application/json
 
 ### topup
-POST {{base}}/api/wallets/6/topups
+POST {{base}}/api/wallets/1/topups
 Accept: application/json
 Content-Type: application/json
 
 {
     "paymentMethodId" : 2,
-    "amount" : 12000
+    "amount" : 53000
 }
 
 ### Get Topup
-GET {{base}}/api/wallets//topups/detail
+GET {{base}}/api/wallets/1/topups/detail
 Accept: application/json
 
 
 ### confirm pembayaran
-PATCH {{base}}/api/wallets/5/topups/confirm
+PATCH {{base}}/api/wallets/1/topups/confirm
 Accept: application/json

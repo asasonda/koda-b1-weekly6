@@ -28,22 +28,22 @@ public sealed class WalletController : ControllerBase
 
 
     
-    [HttpPost("{id}/topups")]
+    [HttpPost("{walletId}/topups")]
     [ProducesResponseType(typeof(TransactionsTopUp), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> TopUp([FromRoute] long id, [FromBody] TopUpRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> TopUp([FromRoute] long walletId, [FromBody] TopUpRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var result = await _service.TopUpAsync(id, request, cancellationToken);
+            var result = await _service.TopUpAsync(walletId, request, cancellationToken);
             if (result is null)
             {
                 return Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     title: "Wallet tidak ditemukan",
-                    detail: $"Wallet untuk user ID {id} tidak ditemukan."
+                    detail: $"Wallet untuk user ID {walletId} tidak ditemukan."
                 );
             }
 

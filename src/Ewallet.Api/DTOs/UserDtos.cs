@@ -62,5 +62,5 @@ public sealed record UserResponse(
     string Status, 
     DateTime CreatedAtUtc, 
     DateTime? UpdatedAtUtc, 
-    WalletResponse WalletResponse 
+    WalletResponse Wallet
 );

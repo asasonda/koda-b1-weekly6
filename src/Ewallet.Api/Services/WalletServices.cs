@@ -33,14 +33,14 @@ public sealed class WalletServices : IWalletServices
         );
     }
 
-    public async Task<TransactionsTopUp?> TopUpAsync(long id, TopUpRequest request, CancellationToken cancellationToken)
+    public async Task<TransactionsTopUp?> TopUpAsync(long walletId, TopUpRequest request, CancellationToken cancellationToken)
     {
-        var wallet = await _repository.GetByIdWallet(id, cancellationToken);
+        // var wallet = await _repository.GetByIdWallet(walletId, cancellationToken);
 
-        if (wallet is null)
-        {
-            return null;
-        }
+        // if (wallet is null)
+        // {
+        //     return null;
+        // }
 
         if(request.Amount <= 0)
         {
@@ -58,7 +58,7 @@ public sealed class WalletServices : IWalletServices
 
         var transaction = new Transactions(
             referenceNo,
-            id,
+            walletId,
             "TOPUP",
             request.Amount,
             "TopUp Saldo"
@@ -66,19 +66,19 @@ public sealed class WalletServices : IWalletServices
 
         var paymentMethod = await _paymentMethod.GetByIdAsync(request.PaymentMethodId, cancellationToken);
 
-        if(paymentMethod is null)
+        if (paymentMethod is null)
         {
-            return null;
+            throw new ArgumentException("Payment method tidak ditemukan");
         }
 
         if (!paymentMethod.IsActive)
         {
-            return null;
+            throw new ArgumentException("Payment method tidak aktif");
         }
 
         var topUp = new TopUpRequests(
             transaction,
-            id,
+            walletId,
             request.PaymentMethodId,
             request.Amount,
             null

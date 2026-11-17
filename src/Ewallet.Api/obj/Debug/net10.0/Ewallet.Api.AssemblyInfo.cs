@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ewallet.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a8acd18d231146b5ace38fcbce4cf417d7a944ed")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec5700cf87726f3c32ffa51601cb8ae58082d1af")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ewallet.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ewallet.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

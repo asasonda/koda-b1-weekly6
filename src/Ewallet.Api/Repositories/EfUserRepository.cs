@@ -45,7 +45,7 @@ public sealed class EfUserRepository : IUserRepository
 
     public async Task<IReadOnlyList<Users>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _db.Users.AsNoTracking().Include(u => u.Wallets).OrderBy(u => u.FullName).ToArrayAsync(cancellationToken);
+        return await _db.Users.AsNoTracking().Include(u => u.Wallets).OrderBy(u => u.Id).ToArrayAsync(cancellationToken);
     }
 
     public async Task<Users?> GetByIdAsync(long id, CancellationToken cancellationToken)

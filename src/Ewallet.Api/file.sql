@@ -65,3 +65,8 @@ join PaymentMethods pm on pm.Id = tp.PaymentMethodId
 select * from AuditLogs
 select * from WalletMutations
 select * from TopUpRequests
+
+
+SELECT *
+FROM Wallets
+WHERE Id = 10;

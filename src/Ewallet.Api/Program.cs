@@ -5,10 +5,6 @@ using Ewallet.Api.Seeding;
 using Ewallet.Api.Services;
 
 
-// using Ewallet.Api.Repositories;
-// using Ewallet.Api.Services;
-
-
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -48,12 +44,18 @@ builder.Services.AddScoped<ITopUpRequestServices, TopUpRequestService>();
 builder.Services.AddScoped<IPaymentMethod, EfPaymentMethodRepository>();
 builder.Services.AddScoped<IPaymentMethodServices, PaymentMethodServices>();
 
+builder.Services.AddScoped<ITransferRepository, EfTransferRepository>();
+builder.Services.AddScoped<ITransferService, TransferService>();
+
+builder.Services.AddScoped<IWalletHistoryRepository, EfWalletHistoryRepository>();
+builder.Services.AddScoped<IWalletHistoryService, WalletHistoryService>();
+
+
+
 // builder.Services.AddScoped<IUserRepository, SqlUserRepository>();
 // builder.Services.AddScoped<IUserServices, UserServices>();
-
 // builder.Services.AddScoped<IWalletRepository, SqlWalletRepository>();
 // builder.Services.AddScoped<IWalletServices, WalletServices>();
-
 // builder.Services.AddScoped<ITransactionRepository, SqlTransactionRepository>();
 
 
@@ -65,10 +67,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         .UseSeeding((context, _) =>
         {
             PaymentMethodSeedData.Seed(context);
+            UserSeedData.Seed(context);
         })
         .UseAsyncSeeding(async (context, _, ct) =>
         {
-                await PaymentMethodSeedData.SeedAsync(context, ct);
+            await PaymentMethodSeedData.SeedAsync(context, ct);
+            await UserSeedData.SeedAsync(context,ct);
         });
 });
 
